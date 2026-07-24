@@ -1,4 +1,9 @@
-<h1>Mes tâches</h1>
+<div class="entete-page">
+  <div>
+    <h1>Bonjour, {{ auth.utilisateur()?.prenom }} 👋</h1>
+    <p class="sous-titre">Voici l'état de vos tâches</p>
+  </div>
+</div>
 
 @if (enChargement()) {
   <div class="etat-chargement">
@@ -11,40 +16,82 @@
     <p>Aucune tâche pour l'instant</p>
   </div>
 } @else {
-  <div class="grille-taches">
-    @for (t of tacheService.mesTaches(); track t.id) {
-      <mat-card class="carte-tache">
-        <mat-card-content>
-          <div class="entete-carte">
-            <span [class]="classePriorite(t.priorite)">{{ libellePriorite(t.priorite) }}</span>
-            <button mat-icon-button [matMenuTriggerFor]="menuStatut" aria-label="Changer le statut">
-              <mat-icon>more_vert</mat-icon>
-            </button>
-            <mat-menu #menuStatut="matMenu">
-              @for (s of statuts; track s) {
-                <button mat-menu-item [disabled]="s === t.statut" (click)="changerStatut(t, s)">
-                  <span>{{ libelleStatut(s) }}</span>
-                </button>
-              }
-            </mat-menu>
+  <div class="grille-stats">
+    <div class="stat">
+      <span class="valeur">{{ tacheService.mesTaches().length }}</span>
+      <span class="libelle">Au total</span>
+    </div>
+    <div class="stat stat--gris">
+      <span class="valeur">{{ colonnes()[0].taches.length }}</span>
+      <span class="libelle">À faire</span>
+    </div>
+    <div class="stat stat--bleu">
+      <span class="valeur">{{ colonnes()[1].taches.length }}</span>
+      <span class="libelle">En cours</span>
+    </div>
+    <div class="stat stat--vert">
+      <span class="valeur">{{ colonnes()[2].taches.length }}</span>
+      <span class="libelle">Terminées</span>
+    </div>
+    @if (enRetardCount() > 0) {
+      <div class="stat stat--alerte">
+        <span class="valeur">{{ enRetardCount() }}</span>
+        <span class="libelle">En retard</span>
+      </div>
+    }
+  </div>
+
+  <div class="tableau-kanban">
+    @for (colonne of colonnes(); track colonne.statut) {
+      <div class="colonne">
+        <div class="entete-colonne">
+          <span [class]="'pastille pastille--' + colonne.statut"></span>
+          <h2>{{ libelleStatut(colonne.statut) }}</h2>
+          <span class="compteur">{{ colonne.taches.length }}</span>
+        </div>
+
+        @if (colonne.taches.length === 0) {
+          <div class="colonne-vide">
+            <p>Rien ici</p>
           </div>
+        } @else {
+          <div class="cartes">
+            @for (t of colonne.taches; track t.id) {
+              <mat-card [class]="'carte-tache carte-tache--' + t.priorite">
+                <mat-card-content>
+                  <div class="entete-carte">
+                    <span [class]="classePriorite(t.priorite)">{{ libellePriorite(t.priorite) }}</span>
+                    <button mat-icon-button [matMenuTriggerFor]="menuStatut" aria-label="Changer le statut">
+                      <mat-icon>more_vert</mat-icon>
+                    </button>
+                    <mat-menu #menuStatut="matMenu">
+                      @for (s of statuts; track s) {
+                        <button mat-menu-item [disabled]="s === t.statut" (click)="changerStatut(t, s)">
+                          <span>{{ libelleStatut(s) }}</span>
+                        </button>
+                      }
+                    </mat-menu>
+                  </div>
 
-          <h3 class="titre">{{ t.titre }}</h3>
-          @if (t.description) {
-            <p class="description">{{ t.description }}</p>
-          }
+                  <h3 class="titre">{{ t.titre }}</h3>
+                  @if (t.description) {
+                    <p class="description">{{ t.description }}</p>
+                  }
 
-          <div class="pied-carte">
-            <span [class]="classeStatut(t.statut)">{{ libelleStatut(t.statut) }}</span>
-            @if (t.date_echeance) {
-              <span class="echeance">
-                <mat-icon inline>event</mat-icon>
-                {{ t.date_echeance | date: 'dd/MM/yyyy' }}
-              </span>
+                  @if (t.date_echeance) {
+                    <div class="pied-carte">
+                      <span class="echeance" [class.echeance--retard]="estEnRetard(t)">
+                        <mat-icon inline>{{ estEnRetard(t) ? 'warning' : 'event' }}</mat-icon>
+                        {{ t.date_echeance | date: 'dd/MM/yyyy' }}
+                      </span>
+                    </div>
+                  }
+                </mat-card-content>
+              </mat-card>
             }
           </div>
-        </mat-card-content>
-      </mat-card>
+        }
+      </div>
     }
   </div>
 }

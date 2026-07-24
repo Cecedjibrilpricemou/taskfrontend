@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { MatCardModule } from '@angular/material/card';
@@ -8,6 +8,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { TacheService } from '../../../core/services/tache.service';
+import { AuthService } from '../../../core/services/auth.service';
 import { MaTache, StatutTache } from '../../../models/tache.model';
 import { classePriorite, classeStatutTache, libellePriorite, libelleStatutTache } from '../../../shared/badges';
 import { ErreurApi } from '../../../models/api.model';
@@ -27,6 +28,7 @@ import { ErreurApi } from '../../../models/api.model';
 })
 export class MesTaches {
   protected readonly tacheService = inject(TacheService);
+  protected readonly auth = inject(AuthService);
   private readonly snackBar = inject(MatSnackBar);
 
   protected readonly libellePriorite = libellePriorite;
@@ -37,6 +39,19 @@ export class MesTaches {
 
   protected readonly enChargement = signal(true);
 
+  protected readonly aujourdhui = new Date(new Date().toDateString());
+
+  protected readonly enRetardCount = computed(
+    () => this.tacheService.mesTaches().filter((t) => this.estEnRetard(t)).length
+  );
+
+  protected readonly colonnes = computed(() =>
+    this.statuts.map((statut) => ({
+      statut,
+      taches: this.tacheService.mesTaches().filter((t) => t.statut === statut),
+    }))
+  );
+
   constructor() {
     this.tacheService.chargerMesTaches().subscribe({
       next: () => this.enChargement.set(false),
@@ -45,6 +60,11 @@ export class MesTaches {
         this.snackBar.open('Impossible de charger vos tâches', 'Fermer', { duration: 4000 });
       },
     });
+  }
+
+  estEnRetard(tache: MaTache): boolean {
+    if (!tache.date_echeance || tache.statut === 'terminee') return false;
+    return new Date(tache.date_echeance) < this.aujourdhui;
   }
 
   changerStatut(tache: MaTache, statut: StatutTache): void {
