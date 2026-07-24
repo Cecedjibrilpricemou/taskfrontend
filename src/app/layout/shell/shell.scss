@@ -5,11 +5,28 @@
 .sidenav {
   width: 240px;
   border-right: none !important;
+  background: #151a24;
+  color: rgba(255, 255, 255, 0.75);
+
+  // Le libellé et l'icône de mat-list-item lisent leurs propres tokens
+  // --mat-list-list-item-* (pas la propriété CSS `color` héritée) -- il
+  // faut donc les cibler explicitement, sinon le texte reste en couleur
+  // "on-surface" du thème clair (quasi invisible sur fond sombre).
+  .mat-mdc-list-item {
+    --mat-list-list-item-label-text-color: rgba(255, 255, 255, 0.85);
+    --mat-list-list-item-leading-icon-color: rgba(255, 255, 255, 0.55);
+    --mat-list-active-indicator-color: transparent;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.06);
+    }
+  }
 }
 
 .lien-actif {
-  background: var(--mat-sys-secondary-container);
-  color: var(--mat-sys-on-secondary-container);
+  background: var(--mat-sys-primary) !important;
+  --mat-list-list-item-label-text-color: #fff !important;
+  --mat-list-list-item-leading-icon-color: #fff !important;
 }
 
 .toolbar {
