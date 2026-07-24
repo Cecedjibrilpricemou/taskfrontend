@@ -1,1 +1,137 @@
+
+// Include theming for Angular Material with `mat.theme()`.
+// This Sass mixin will define CSS variables that are used for styling Angular Material
+// components according to the Material 3 design spec.
+// Learn more about theming and how to use it for your application's
+// custom components at https://material.angular.dev/guide/theming
+@use '@angular/material' as mat;
+
+html {
+  height: 100%;
+  @include mat.theme((
+    color: (
+      theme-type: light,
+      primary: mat.$blue-palette,
+      tertiary: mat.$azure-palette,
+    ),
+    typography: Roboto,
+    density: 0,
+  ));
+}
+
+body {
+  // Default the application to a light color theme. This can be changed to
+  // `dark` to enable the dark color theme, or to `light dark` to defer to the
+  // user's system settings.
+  color-scheme: light;
+
+  // Set a default background, font and text colors for the application using
+  // Angular Material's system-level CSS variables. Learn more about these
+  // variables at https://material.angular.dev/guide/system-variables
+  background-color: var(--mat-sys-surface);
+  color: var(--mat-sys-on-surface);
+  font: var(--mat-sys-body-medium);
+
+  // Reset the user agent margin.
+  margin: 0;
+  height: 100%;
+}
 /* You can add global styles to this file, and also import other style files */
+
+// Le système de tokens M3 de mat.theme() ne propage pas automatiquement
+// --mat-sys-error aux boutons color="warn" : les composants mat-button lisent
+// les tokens --mat-button-* (et non --mdc-*), on les force explicitement.
+.mat-mdc-unelevated-button.mat-warn,
+.mat-mdc-raised-button.mat-warn {
+  --mat-button-filled-container-color: var(--mat-sys-error);
+  --mat-button-filled-label-text-color: var(--mat-sys-on-error);
+  --mat-button-protected-container-color: var(--mat-sys-error);
+  --mat-button-protected-label-text-color: var(--mat-sys-on-error);
+}
+
+.mat-mdc-button.mat-warn {
+  --mat-button-text-label-text-color: var(--mat-sys-error);
+}
+
+.mat-mdc-outlined-button.mat-warn {
+  --mat-button-outlined-label-text-color: var(--mat-sys-error);
+  --mat-button-outlined-outline-color: var(--mat-sys-error);
+}
+
+.mat-mdc-icon-button.mat-warn {
+  --mat-icon-button-state-layer-color: var(--mat-sys-error);
+  --mat-icon-button-icon-color: var(--mat-sys-error);
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.6;
+  white-space: nowrap;
+}
+
+.badge--rouge {
+  background: #fde2e1;
+  color: #8c1d18;
+}
+
+.badge--orange {
+  background: #fdead1;
+  color: #8a5300;
+}
+
+.badge--vert {
+  background: #dcf3e2;
+  color: #1e6b34;
+}
+
+.badge--bleu {
+  background: #dbe7fb;
+  color: #1a4a9e;
+}
+
+.badge--gris {
+  background: #e4e4e7;
+  color: #45464a;
+}
+
+.etat-vide {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 56px 24px;
+  color: var(--mat-sys-on-surface-variant);
+  text-align: center;
+
+  mat-icon {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+    opacity: 0.6;
+  }
+
+  p {
+    margin: 0;
+    font-size: 0.95rem;
+  }
+}
+
+.menu-notifications.mat-mdc-menu-panel {
+  max-width: 360px !important;
+}
+
+.etat-chargement {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 56px 24px;
+  color: var(--mat-sys-on-surface-variant);
+}

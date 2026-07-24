@@ -1,0 +1,36 @@
+<h2 mat-dialog-title>Attribuer « {{ donnees.tache.titre }} »</h2>
+
+<mat-dialog-content>
+  @if (utilisateursAssignables.length === 0) {
+    <p class="aucun">Aucun utilisateur disponible pour l'attribution.</p>
+  } @else {
+    <div class="liste-checkbox">
+      @for (u of utilisateursAssignables; track u.id) {
+        <mat-checkbox
+          [checked]="selection().has(u.id)"
+          (change)="basculer(u.id, $event.checked)"
+        >
+          {{ u.prenom }} {{ u.nom }}
+        </mat-checkbox>
+      }
+    </div>
+  }
+
+  @if (erreur()) {
+    <div class="message-erreur">
+      <mat-icon>error_outline</mat-icon>
+      <span>{{ erreur() }}</span>
+    </div>
+  }
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button type="button" (click)="annuler()">Annuler</button>
+  <button mat-flat-button color="primary" (click)="soumettre()" [disabled]="enCours()">
+    @if (enCours()) {
+      <mat-spinner diameter="20" />
+    } @else {
+      <span>Attribuer</span>
+    }
+  </button>
+</mat-dialog-actions>

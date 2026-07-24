@@ -1,0 +1,110 @@
+<h1>Tableau de bord</h1>
+
+@if (enChargement()) {
+  <div class="etat-chargement">
+    <mat-spinner diameter="40" />
+    <p>Chargement des indicateurs…</p>
+  </div>
+} @else if (kpis(); as k) {
+  <div class="grille-stats">
+    <mat-card class="tuile">
+      <mat-icon class="icone">checklist</mat-icon>
+      <div class="valeur">{{ k.synthese.total_taches }}</div>
+      <div class="libelle">Tâches au total</div>
+    </mat-card>
+    <mat-card class="tuile">
+      <mat-icon class="icone">task_alt</mat-icon>
+      <div class="valeur">{{ tauxCompletion() }}%</div>
+      <div class="libelle">Taux de complétion</div>
+    </mat-card>
+    <mat-card class="tuile">
+      <mat-icon class="icone">schedule</mat-icon>
+      <div class="valeur">{{ k.synthese.taches_en_cours }}</div>
+      <div class="libelle">En cours</div>
+    </mat-card>
+    <mat-card class="tuile tuile--alerte">
+      <mat-icon class="icone">warning</mat-icon>
+      <div class="valeur">{{ k.synthese.taches_en_retard }}</div>
+      <div class="libelle">En retard</div>
+    </mat-card>
+    <mat-card class="tuile">
+      <mat-icon class="icone">group</mat-icon>
+      <div class="valeur">{{ k.synthese.utilisateurs_actifs }}</div>
+      <div class="libelle">Utilisateurs actifs</div>
+    </mat-card>
+  </div>
+
+  <div class="grille-graphiques">
+    <mat-card class="carte-graphique">
+      <h2>Répartition par statut</h2>
+      @if (k.parStatut.length === 0) {
+        <div class="etat-vide etat-vide--compact">
+          <mat-icon>pie_chart</mat-icon>
+          <p>Pas encore de données</p>
+        </div>
+      } @else {
+        <div class="zone-graphique">
+          <canvas baseChart [data]="donneesStatut()" [options]="optionsDoughnut" type="doughnut"></canvas>
+        </div>
+      }
+    </mat-card>
+
+    <mat-card class="carte-graphique">
+      <h2>Répartition par priorité</h2>
+      @if (k.parPriorite.length === 0) {
+        <div class="etat-vide etat-vide--compact">
+          <mat-icon>bar_chart</mat-icon>
+          <p>Pas encore de données</p>
+        </div>
+      } @else {
+        <div class="zone-graphique">
+          <canvas baseChart [data]="donneesPriorite()" [options]="optionsBar" type="bar"></canvas>
+        </div>
+      }
+    </mat-card>
+  </div>
+
+  <div class="grille-listes">
+    <mat-card class="carte-liste">
+      <h2>Tâches en retard</h2>
+      @if (k.enRetard.length === 0) {
+        <div class="etat-vide etat-vide--compact">
+          <mat-icon>event_available</mat-icon>
+          <p>Aucune tâche en retard</p>
+        </div>
+      } @else {
+        <div class="liste-retard">
+          @for (t of k.enRetard; track t.id) {
+            <div class="ligne-retard">
+              <span class="titre">{{ t.titre }}</span>
+              <span [class]="classePriorite(t.priorite)">{{ libellePriorite(t.priorite) }}</span>
+              <span class="echeance">{{ t.date_echeance | date: 'dd/MM/yyyy' }}</span>
+            </div>
+          }
+        </div>
+      }
+    </mat-card>
+
+    <mat-card class="carte-liste">
+      <h2>Charge par utilisateur</h2>
+      @if (k.chargeUtilisateurs.length === 0) {
+        <div class="etat-vide etat-vide--compact">
+          <mat-icon>groups</mat-icon>
+          <p>Aucun utilisateur avec des tâches actives</p>
+        </div>
+      } @else {
+        <div class="liste-charge">
+          @for (c of k.chargeUtilisateurs; track c.utilisateur_id) {
+            <div class="ligne-charge">
+              <div class="entete-ligne">
+                <span>{{ c.utilisateur_nom }}</span>
+                <span class="nb">{{ c.nb_taches_actives }}</span>
+              </div>
+              <mat-progress-bar mode="determinate" [value]="(c.nb_taches_actives / chargeMax()) * 100" />
+            </div>
+          }
+        </div>
+      }
+    </mat-card>
+  </div>
+}

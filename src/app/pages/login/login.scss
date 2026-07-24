@@ -1,0 +1,42 @@
+.page-connexion {
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--mat-sys-surface-container-low);
+  padding: 16px;
+}
+
+.carte-connexion {
+  width: 100%;
+  max-width: 400px;
+  padding: 8px;
+}
+
+.formulaire {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 8px;
+}
+
+.message-erreur {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: var(--mat-sys-error-container);
+  color: var(--mat-sys-on-error-container);
+  font-size: 0.875rem;
+  margin-bottom: 8px;
+
+  mat-icon {
+    flex-shrink: 0;
+  }
+}
+
+.bouton-connexion {
+  height: 44px;
+  margin-top: 8px;
+}

@@ -1,0 +1,14 @@
+<h2 mat-dialog-title>{{ donnees.titre }}</h2>
+<mat-dialog-content>
+  <p>{{ donnees.message }}</p>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button (click)="annuler()">{{ donnees.texteAnnuler ?? 'Annuler' }}</button>
+  <button
+    mat-flat-button
+    [color]="donnees.destructif ? 'warn' : 'primary'"
+    (click)="confirmer()"
+  >
+    {{ donnees.texteConfirmer ?? 'Confirmer' }}
+  </button>
+</mat-dialog-actions>

@@ -1,0 +1,73 @@
+<mat-sidenav-container class="conteneur">
+  @if (auth.isAdmin()) {
+    <mat-sidenav
+      [mode]="estMobile() ? 'over' : 'side'"
+      [opened]="sidenavOuvert()"
+      (closedStart)="sidenavOuvert.set(false)"
+      class="sidenav"
+    >
+      <mat-nav-list>
+        @for (lien of liensAdmin; track lien.route) {
+          <a
+            mat-list-item
+            [routerLink]="lien.route"
+            routerLinkActive="lien-actif"
+            (click)="fermerSidenavSiMobile()"
+          >
+            <mat-icon matListItemIcon>{{ lien.icone }}</mat-icon>
+            <span matListItemTitle>{{ lien.label }}</span>
+          </a>
+        }
+      </mat-nav-list>
+    </mat-sidenav>
+  }
+
+  <mat-sidenav-content>
+    <mat-toolbar color="primary" class="toolbar">
+      @if (auth.isAdmin()) {
+        <button mat-icon-button (click)="basculerSidenav()" aria-label="Ouvrir le menu">
+          <mat-icon>menu</mat-icon>
+        </button>
+      }
+      <span class="titre-app">TaskManager</span>
+      <span class="espaceur"></span>
+
+      <button mat-icon-button [matMenuTriggerFor]="menuNotifs" aria-label="Notifications">
+        <mat-icon
+          aria-hidden="false"
+          [matBadge]="notificationService.nbNonLues()"
+          [matBadgeHidden]="notificationService.nbNonLues() === 0"
+          matBadgeColor="warn"
+          matBadgeSize="small"
+        >
+          notifications
+        </mat-icon>
+      </button>
+      <mat-menu #menuNotifs="matMenu" class="menu-notifications">
+        <app-notifications-panel />
+      </mat-menu>
+
+      <button mat-icon-button [matMenuTriggerFor]="menuCompte" aria-label="Compte">
+        <mat-icon>account_circle</mat-icon>
+      </button>
+      <mat-menu #menuCompte="matMenu">
+        <div class="entete-menu-compte">
+          <strong>{{ auth.utilisateur()?.prenom }} {{ auth.utilisateur()?.nom }}</strong>
+          <span class="role">{{ auth.isAdmin() ? 'Administrateur' : 'Utilisateur' }}</span>
+        </div>
+        <button mat-menu-item (click)="ouvrirMotDePasse()">
+          <mat-icon>lock</mat-icon>
+          <span>Changer mon mot de passe</span>
+        </button>
+        <button mat-menu-item (click)="deconnexion()">
+          <mat-icon>logout</mat-icon>
+          <span>Déconnexion</span>
+        </button>
+      </mat-menu>
+    </mat-toolbar>
+
+    <main class="contenu">
+      <router-outlet />
+    </main>
+  </mat-sidenav-content>
+</mat-sidenav-container>

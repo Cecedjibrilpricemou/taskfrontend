@@ -1,0 +1,55 @@
+<h2 mat-dialog-title>{{ modeEdition ? 'Modifier la tâche' : 'Nouvelle tâche' }}</h2>
+
+<form [formGroup]="formulaire" (ngSubmit)="soumettre()">
+  <mat-dialog-content>
+    <div class="formulaire">
+      <mat-form-field appearance="outline">
+        <mat-label>Titre</mat-label>
+        <input matInput formControlName="titre" />
+        @if (formulaire.controls.titre.hasError('required') && formulaire.controls.titre.touched) {
+          <mat-error>Requis</mat-error>
+        }
+        @if (formulaire.controls.titre.hasError('minlength') && formulaire.controls.titre.touched) {
+          <mat-error>Au moins 3 caractères</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Description</mat-label>
+        <textarea matInput formControlName="description" rows="3"></textarea>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Priorité</mat-label>
+        <mat-select formControlName="priorite">
+          @for (p of priorites; track p) {
+            <mat-option [value]="p">{{ p === 'basse' ? 'Basse' : p === 'moyenne' ? 'Moyenne' : 'Haute' }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Échéance</mat-label>
+        <input matInput type="date" formControlName="dateEcheance" />
+      </mat-form-field>
+
+      @if (erreur()) {
+        <div class="message-erreur">
+          <mat-icon>error_outline</mat-icon>
+          <span>{{ erreur() }}</span>
+        </div>
+      }
+    </div>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button type="button" (click)="annuler()">Annuler</button>
+    <button mat-flat-button color="primary" type="submit" [disabled]="enCours()">
+      @if (enCours()) {
+        <mat-spinner diameter="20" />
+      } @else {
+        <span>{{ modeEdition ? 'Enregistrer' : 'Créer' }}</span>
+      }
+    </button>
+  </mat-dialog-actions>
+</form>

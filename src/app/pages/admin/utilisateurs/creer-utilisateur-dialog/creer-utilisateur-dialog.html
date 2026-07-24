@@ -1,0 +1,63 @@
+<h2 mat-dialog-title>Nouvel utilisateur</h2>
+
+<form [formGroup]="formulaire" (ngSubmit)="soumettre()">
+  <mat-dialog-content>
+    <div class="formulaire">
+      <mat-form-field appearance="outline">
+        <mat-label>Prénom</mat-label>
+        <input matInput formControlName="prenom" />
+        @if (formulaire.controls.prenom.hasError('required') && formulaire.controls.prenom.touched) {
+          <mat-error>Requis</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Nom</mat-label>
+        <input matInput formControlName="nom" />
+        @if (formulaire.controls.nom.hasError('required') && formulaire.controls.nom.touched) {
+          <mat-error>Requis</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Email</mat-label>
+        <input matInput type="email" formControlName="email" />
+        @if (formulaire.controls.email.hasError('required') && formulaire.controls.email.touched) {
+          <mat-error>Requis</mat-error>
+        }
+        @if (formulaire.controls.email.hasError('email') && formulaire.controls.email.touched) {
+          <mat-error>Format d'email invalide</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Mot de passe initial</mat-label>
+        <input matInput type="password" formControlName="motDePasse" />
+        @if (formulaire.controls.motDePasse.hasError('required') && formulaire.controls.motDePasse.touched) {
+          <mat-error>Requis</mat-error>
+        }
+        @if (formulaire.controls.motDePasse.hasError('minlength') && formulaire.controls.motDePasse.touched) {
+          <mat-error>Au moins 8 caractères</mat-error>
+        }
+      </mat-form-field>
+
+      @if (erreur()) {
+        <div class="message-erreur">
+          <mat-icon>error_outline</mat-icon>
+          <span>{{ erreur() }}</span>
+        </div>
+      }
+    </div>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button type="button" (click)="annuler()">Annuler</button>
+    <button mat-flat-button color="primary" type="submit" [disabled]="enCours()">
+      @if (enCours()) {
+        <mat-spinner diameter="20" />
+      } @else {
+        <span>Créer</span>
+      }
+    </button>
+  </mat-dialog-actions>
+</form>

@@ -1,0 +1,52 @@
+<h2 mat-dialog-title>Changer mon mot de passe</h2>
+
+<form [formGroup]="formulaire" (ngSubmit)="soumettre()">
+  <mat-dialog-content>
+    <div class="formulaire">
+      <mat-form-field appearance="outline">
+        <mat-label>Mot de passe actuel</mat-label>
+        <input matInput type="password" formControlName="ancienMotDePasse" autocomplete="current-password" />
+        @if (formulaire.controls.ancienMotDePasse.hasError('required') && formulaire.controls.ancienMotDePasse.touched) {
+          <mat-error>Requis</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Nouveau mot de passe</mat-label>
+        <input matInput type="password" formControlName="nouveauMotDePasse" autocomplete="new-password" />
+        @if (formulaire.controls.nouveauMotDePasse.hasError('required') && formulaire.controls.nouveauMotDePasse.touched) {
+          <mat-error>Requis</mat-error>
+        }
+        @if (formulaire.controls.nouveauMotDePasse.hasError('minlength') && formulaire.controls.nouveauMotDePasse.touched) {
+          <mat-error>Au moins 8 caractères</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Confirmer le nouveau mot de passe</mat-label>
+        <input matInput type="password" formControlName="confirmationMotDePasse" autocomplete="new-password" />
+        @if (formulaire.hasError('motsDePasseDifferents') && formulaire.controls.confirmationMotDePasse.touched) {
+          <mat-error>Les mots de passe ne correspondent pas</mat-error>
+        }
+      </mat-form-field>
+
+      @if (erreur()) {
+        <div class="message-erreur">
+          <mat-icon>error_outline</mat-icon>
+          <span>{{ erreur() }}</span>
+        </div>
+      }
+    </div>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button type="button" (click)="annuler()">Annuler</button>
+    <button mat-flat-button color="primary" type="submit" [disabled]="enCours()">
+      @if (enCours()) {
+        <mat-spinner diameter="20" />
+      } @else {
+        <span>Enregistrer</span>
+      }
+    </button>
+  </mat-dialog-actions>
+</form>

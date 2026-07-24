@@ -1,0 +1,22 @@
+.formulaire {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 320px;
+  padding-top: 4px;
+}
+
+.message-erreur {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: var(--mat-sys-error-container);
+  color: var(--mat-sys-on-error-container);
+  font-size: 0.875rem;
+
+  mat-icon {
+    flex-shrink: 0;
+  }
+}

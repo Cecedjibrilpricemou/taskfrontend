@@ -1,0 +1,26 @@
+.entete-page {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  gap: 12px;
+  flex-wrap: wrap;
+
+  h1 {
+    margin: 0;
+  }
+
+  button mat-icon {
+    margin-right: 6px;
+  }
+}
+
+.conteneur-table {
+  background: var(--mat-sys-surface-container-low);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.table {
+  width: 100%;
+}

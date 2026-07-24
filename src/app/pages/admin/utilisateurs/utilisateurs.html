@@ -1,0 +1,82 @@
+<div class="entete-page">
+  <h1>Utilisateurs</h1>
+  <button mat-flat-button color="primary" (click)="ouvrirCreation()">
+    <mat-icon>person_add</mat-icon>
+    Nouvel utilisateur
+  </button>
+</div>
+
+@if (enChargement()) {
+  <div class="etat-chargement">
+    <mat-spinner diameter="40" />
+    <p>Chargement des utilisateurs…</p>
+  </div>
+} @else if (source.data.length === 0) {
+  <div class="etat-vide">
+    <mat-icon>group_off</mat-icon>
+    <p>Aucun utilisateur pour l'instant</p>
+  </div>
+} @else {
+  <div class="conteneur-table">
+    <table mat-table [dataSource]="source" class="table">
+      <ng-container matColumnDef="nom">
+        <th mat-header-cell *matHeaderCellDef>Nom</th>
+        <td mat-cell *matCellDef="let u">{{ u.prenom }} {{ u.nom }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="email">
+        <th mat-header-cell *matHeaderCellDef>Email</th>
+        <td mat-cell *matCellDef="let u">{{ u.email }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="role">
+        <th mat-header-cell *matHeaderCellDef>Rôle</th>
+        <td mat-cell *matCellDef="let u">{{ u.role === 'admin' ? 'Administrateur' : 'Utilisateur' }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="statut">
+        <th mat-header-cell *matHeaderCellDef>Statut</th>
+        <td mat-cell *matCellDef="let u">
+          <span [class]="classeStatut(u.statut)">{{ libelleStatut(u.statut) }}</span>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="derniere_connexion">
+        <th mat-header-cell *matHeaderCellDef>Dernière connexion</th>
+        <td mat-cell *matCellDef="let u">
+          {{ u.derniere_connexion ? (u.derniere_connexion | date: 'dd/MM/yyyy HH:mm') : 'Jamais' }}
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef></th>
+        <td mat-cell *matCellDef="let u">
+          @if (u.role !== 'admin') {
+            <button mat-icon-button [matMenuTriggerFor]="menuStatut" aria-label="Changer le statut">
+              <mat-icon>more_vert</mat-icon>
+            </button>
+            <mat-menu #menuStatut="matMenu">
+              <button mat-menu-item (click)="demanderChangementStatut(u, 'actif')">
+                <mat-icon>check_circle</mat-icon>
+                <span>Activer</span>
+              </button>
+              <button mat-menu-item (click)="demanderChangementStatut(u, 'bloque')">
+                <mat-icon>block</mat-icon>
+                <span>Bloquer</span>
+              </button>
+              <button mat-menu-item (click)="demanderChangementStatut(u, 'desactive')">
+                <mat-icon>person_off</mat-icon>
+                <span>Désactiver</span>
+              </button>
+            </mat-menu>
+          }
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="colonnes"></tr>
+      <tr mat-row *matRowDef="let row; columns: colonnes"></tr>
+    </table>
+
+    <mat-paginator [pageSizeOptions]="[10, 25, 50]" [pageSize]="10" showFirstLastButtons />
+  </div>
+}

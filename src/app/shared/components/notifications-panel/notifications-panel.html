@@ -1,0 +1,32 @@
+<div class="panneau-notifications">
+  <div class="entete">
+    <span>Notifications</span>
+    @if (notificationService.nbNonLues() > 0) {
+      <span class="compteur">{{ notificationService.nbNonLues() }} non lue(s)</span>
+    }
+  </div>
+
+  @if (notificationService.notifications().length === 0) {
+    <div class="etat-vide etat-vide--compact">
+      <mat-icon>notifications_none</mat-icon>
+      <p>Aucune notification pour l'instant</p>
+    </div>
+  } @else {
+    <mat-nav-list class="liste">
+      @for (notif of notificationService.notifications(); track notif.id) {
+        <a
+          mat-list-item
+          class="item-notification"
+          [class.item-notification--non-lue]="!notif.lue"
+          (click)="ouvrir(notif.id, notif.lue)"
+        >
+          <span class="puce" [class.puce--visible]="!notif.lue"></span>
+          <div class="contenu">
+            <span class="message">{{ notif.message }}</span>
+            <span class="date">{{ notif.date_creation | date: 'dd/MM/yyyy HH:mm' }}</span>
+          </div>
+        </a>
+      }
+    </mat-nav-list>
+  }
+</div>

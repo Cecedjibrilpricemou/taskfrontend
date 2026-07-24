@@ -1,0 +1,57 @@
+.entete-page {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  gap: 12px;
+  flex-wrap: wrap;
+
+  h1 {
+    margin: 0;
+  }
+
+  button mat-icon {
+    margin-right: 6px;
+  }
+}
+
+.filtres {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+
+.champ-filtre {
+  width: 180px;
+}
+
+.conteneur-table {
+  background: var(--mat-sys-surface-container-low);
+  border-radius: 12px;
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+}
+
+.cellule-titre {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 6px 0;
+
+  .titre {
+    font-weight: 500;
+  }
+
+  .description {
+    font-size: 0.8rem;
+    color: var(--mat-sys-on-surface-variant);
+    max-width: 260px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}

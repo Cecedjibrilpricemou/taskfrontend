@@ -1,0 +1,116 @@
+<div class="entete-page">
+  <h1>Tâches</h1>
+  <button mat-flat-button color="primary" (click)="ouvrirCreation()">
+    <mat-icon>add_task</mat-icon>
+    Nouvelle tâche
+  </button>
+</div>
+
+<div class="filtres">
+  <mat-form-field appearance="outline" class="champ-filtre">
+    <mat-label>Statut</mat-label>
+    <mat-select [value]="filtreStatut()" (selectionChange)="filtreStatut.set($event.value)">
+      <mat-option value="">Tous</mat-option>
+      <mat-option value="a_faire">À faire</mat-option>
+      <mat-option value="en_cours">En cours</mat-option>
+      <mat-option value="terminee">Terminée</mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" class="champ-filtre">
+    <mat-label>Priorité</mat-label>
+    <mat-select [value]="filtrePriorite()" (selectionChange)="filtrePriorite.set($event.value)">
+      <mat-option value="">Toutes</mat-option>
+      <mat-option value="basse">Basse</mat-option>
+      <mat-option value="moyenne">Moyenne</mat-option>
+      <mat-option value="haute">Haute</mat-option>
+    </mat-select>
+  </mat-form-field>
+</div>
+
+@if (enChargement()) {
+  <div class="etat-chargement">
+    <mat-spinner diameter="40" />
+    <p>Chargement des tâches…</p>
+  </div>
+} @else if (tachesFiltrees().length === 0) {
+  <div class="etat-vide">
+    <mat-icon>checklist</mat-icon>
+    <p>Aucune tâche pour l'instant</p>
+  </div>
+} @else {
+  <div class="conteneur-table">
+    <table mat-table [dataSource]="tachesFiltrees()" class="table">
+      <ng-container matColumnDef="titre">
+        <th mat-header-cell *matHeaderCellDef>Titre</th>
+        <td mat-cell *matCellDef="let t">
+          <div class="cellule-titre">
+            <span class="titre">{{ t.titre }}</span>
+            @if (t.description) {
+              <span class="description">{{ t.description }}</span>
+            }
+          </div>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="priorite">
+        <th mat-header-cell *matHeaderCellDef>Priorité</th>
+        <td mat-cell *matCellDef="let t">
+          <span [class]="classePriorite(t.priorite)">{{ libellePriorite(t.priorite) }}</span>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="statut">
+        <th mat-header-cell *matHeaderCellDef>Statut</th>
+        <td mat-cell *matCellDef="let t">
+          <span [class]="classeStatut(t.statut)">{{ libelleStatut(t.statut) }}</span>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="echeance">
+        <th mat-header-cell *matHeaderCellDef>Échéance</th>
+        <td mat-cell *matCellDef="let t">
+          {{ t.date_echeance ? (t.date_echeance | date: 'dd/MM/yyyy') : '—' }}
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="cree_par">
+        <th mat-header-cell *matHeaderCellDef>Créée par</th>
+        <td mat-cell *matCellDef="let t">{{ t.cree_par_nom }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="assignes">
+        <th mat-header-cell *matHeaderCellDef>Assignés</th>
+        <td mat-cell *matCellDef="let t">
+          {{ t.utilisateurs_assignes_noms || 'Personne' }}
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef></th>
+        <td mat-cell *matCellDef="let t">
+          <button mat-icon-button [matMenuTriggerFor]="menuActions" aria-label="Actions">
+            <mat-icon>more_vert</mat-icon>
+          </button>
+          <mat-menu #menuActions="matMenu">
+            <button mat-menu-item (click)="ouvrirEdition(t)">
+              <mat-icon>edit</mat-icon>
+              <span>Modifier</span>
+            </button>
+            <button mat-menu-item (click)="ouvrirAttribution(t)">
+              <mat-icon>group_add</mat-icon>
+              <span>Attribuer</span>
+            </button>
+            <button mat-menu-item (click)="demanderSuppression(t)">
+              <mat-icon>delete</mat-icon>
+              <span>Supprimer</span>
+            </button>
+          </mat-menu>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="colonnes"></tr>
+      <tr mat-row *matRowDef="let row; columns: colonnes"></tr>
+    </table>
+  </div>
+}
