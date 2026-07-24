@@ -51,9 +51,9 @@ export class Shell {
   );
 
   protected readonly liensAdmin = [
+    { route: '/admin/tableau-de-bord', icone: 'bar_chart', label: 'Tableau de bord' },
     { route: '/admin/utilisateurs', icone: 'group', label: 'Utilisateurs' },
     { route: '/admin/taches', icone: 'checklist', label: 'Tâches' },
-    { route: '/admin/tableau-de-bord', icone: 'bar_chart', label: 'Tableau de bord' },
   ];
 
   constructor() {
