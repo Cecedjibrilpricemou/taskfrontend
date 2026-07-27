@@ -1,4 +1,4 @@
-import { Component, effect, inject, signal } from '@angular/core';
+import { Component, OnDestroy, effect, inject, signal } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -35,7 +35,7 @@ import { MotDePasseDialog } from '../../shared/components/mot-de-passe-dialog/mo
   templateUrl: './shell.html',
   styleUrl: './shell.scss',
 })
-export class Shell {
+export class Shell implements OnDestroy {
   protected readonly auth = inject(AuthService);
   protected readonly notificationService = inject(NotificationService);
   private readonly router = inject(Router);
@@ -58,10 +58,15 @@ export class Shell {
 
   constructor() {
     this.notificationService.charger().subscribe();
+    this.notificationService.demarrerSondage();
 
     effect(() => {
       this.sidenavOuvert.set(!this.estMobile());
     });
+  }
+
+  ngOnDestroy(): void {
+    this.notificationService.arreterSondage();
   }
 
   basculerSidenav(): void {
@@ -86,7 +91,6 @@ export class Shell {
   }
 
   deconnexion(): void {
-    this.auth.logout();
-    this.router.navigate(['/login']);
+    this.auth.logout().subscribe(() => this.router.navigate(['/login']));
   }
 }
