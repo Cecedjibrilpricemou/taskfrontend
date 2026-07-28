@@ -55,14 +55,40 @@ export class NotificationService {
     this.abonnementSondage = undefined;
   }
 
+  // Remet le service à son état initial -- à appeler à chaque changement de
+  // session (logout, session expirée) pour éviter que les notifications
+  // (et les ids déjà vus) d'un compte ne fuitent vers le suivant sur un
+  // même poste.
+  reinitialiser(): void {
+    this.arreterSondage();
+    this.idsConnus = new Set();
+    this.premierChargement = true;
+    this.notificationsSignal.set([]);
+  }
+
   private traiterReponse(notifications: NotificationTache[]): void {
     if (!this.premierChargement) {
       const nouvelles = notifications.filter((n) => !this.idsConnus.has(n.id));
-      nouvelles.forEach((n) => this.signalerNouvelle(n));
+      this.signalerNouvelles(nouvelles);
     }
     this.idsConnus = new Set(notifications.map((n) => n.id));
     this.premierChargement = false;
     this.notificationsSignal.set(notifications);
+  }
+
+  // MatSnackBar n'affiche qu'un pop-up à la fois : en ouvrir plusieurs à la
+  // suite (une par notification) fait disparaître les précédentes avant
+  // même que l'utilisateur les voie. On regroupe donc les arrivées
+  // multiples en un seul pop-up récapitulatif.
+  private signalerNouvelles(nouvelles: NotificationTache[]): void {
+    if (nouvelles.length === 0) return;
+    if (nouvelles.length === 1) {
+      this.signalerNouvelle(nouvelles[0]);
+      return;
+    }
+    this.snackBar.open(`${nouvelles.length} nouvelles notifications`, 'Fermer', {
+      duration: 12000,
+    });
   }
 
   // Le pop-up ne révèle le contenu qu'au clic, moment où il est aussi

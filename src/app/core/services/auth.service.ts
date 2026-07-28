@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, catchError, map, of, tap } from 'rxjs';
 import { API_BASE_URL } from '../api-config';
 import { Utilisateur } from '../../models/utilisateur.model';
+import { NotificationService } from './notification.service';
 
 interface ConnexionReponse {
   status: 'ok';
@@ -21,6 +22,7 @@ interface MeReponse {
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private readonly http = inject(HttpClient);
+  private readonly notificationService = inject(NotificationService);
 
   private readonly utilisateurSignal = signal<Utilisateur | null>(null);
 
@@ -51,9 +53,12 @@ export class AuthService {
   }
 
   logout(): Observable<unknown> {
-    return this.http
-      .post(`${API_BASE_URL}/auth/logout`, {})
-      .pipe(tap(() => this.utilisateurSignal.set(null)));
+    return this.http.post(`${API_BASE_URL}/auth/logout`, {}).pipe(
+      tap(() => {
+        this.utilisateurSignal.set(null);
+        this.notificationService.reinitialiser();
+      })
+    );
   }
 
   // Utilisé par l'intercepteur quand une requête échoue en 401 : la session
@@ -62,5 +67,6 @@ export class AuthService {
   // l'état local sans requête réseau, pour éviter une boucle.
   reinitialiserSessionExpiree(): void {
     this.utilisateurSignal.set(null);
+    this.notificationService.reinitialiser();
   }
 }
