@@ -1,11 +1,10 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { Subscription, interval, switchMap, tap } from 'rxjs';
-import { API_BASE_URL } from '../api-config';
+import { tap } from 'rxjs';
+import { io, Socket } from 'socket.io-client';
+import { API_BASE_URL, SOCKET_URL } from '../api-config';
 import { NotificationTache } from '../../models/notification.model';
-
-const INTERVALLE_SONDAGE_MS = 25000;
 
 @Injectable({ providedIn: 'root' })
 export class NotificationService {
@@ -16,11 +15,11 @@ export class NotificationService {
   readonly notifications = this.notificationsSignal.asReadonly();
   readonly nbNonLues = computed(() => this.notificationsSignal().filter((n) => !n.lue).length);
 
-  // Ids déjà vus lors d'un sondage précédent -- sert à détecter les
-  // notifications réellement nouvelles (pas juste "toujours non lues").
+  // Ids déjà vus -- sert à détecter les notifications réellement nouvelles
+  // (pas juste "toujours non lues") lors d'un rechargement complet.
   private idsConnus = new Set<number>();
   private premierChargement = true;
-  private abonnementSondage?: Subscription;
+  private socket?: Socket;
 
   charger() {
     return this.http
@@ -40,19 +39,28 @@ export class NotificationService {
       );
   }
 
-  // Démarre le sondage régulier (pas de WebSocket : disproportionné pour ce
-  // volume, déjà tranché comme bonus hors socle). Idempotent : un appel
-  // répété sans arreterSondage() entre-deux ne double pas le polling.
-  demarrerSondage(): void {
-    if (this.abonnementSondage) return;
-    this.abonnementSondage = interval(INTERVALLE_SONDAGE_MS)
-      .pipe(switchMap(() => this.charger()))
-      .subscribe();
+  // Ouvre la connexion WebSocket temps réel. Idempotent : un appel répété
+  // sans deconnecterTempsReel() entre-deux ne recrée pas de socket.
+  connecterTempsReel(): void {
+    if (this.socket) return;
+    this.socket = io(SOCKET_URL, { withCredentials: true });
+
+    // Couvre initial connect + reconnexions auto de socket.io : le serveur
+    // ne rejoue pas les événements manqués pendant une déconnexion, donc on
+    // resynchronise la liste complète à chaque (re)connexion plutôt que de
+    // ne compter que sur les événements poussés en direct.
+    this.socket.on('connect', () => this.charger().subscribe());
+
+    this.socket.on('notification:new', (notif: NotificationTache) => {
+      this.notificationsSignal.update((liste) => [notif, ...liste]);
+      this.idsConnus.add(notif.id);
+      this.signalerNouvelle(notif);
+    });
   }
 
-  arreterSondage(): void {
-    this.abonnementSondage?.unsubscribe();
-    this.abonnementSondage = undefined;
+  deconnecterTempsReel(): void {
+    this.socket?.disconnect();
+    this.socket = undefined;
   }
 
   // Remet le service à son état initial -- à appeler à chaque changement de
@@ -60,7 +68,7 @@ export class NotificationService {
   // (et les ids déjà vus) d'un compte ne fuitent vers le suivant sur un
   // même poste.
   reinitialiser(): void {
-    this.arreterSondage();
+    this.deconnecterTempsReel();
     this.idsConnus = new Set();
     this.premierChargement = true;
     this.notificationsSignal.set([]);

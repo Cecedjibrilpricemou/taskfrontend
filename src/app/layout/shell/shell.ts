@@ -58,7 +58,7 @@ export class Shell implements OnDestroy {
 
   constructor() {
     this.notificationService.charger().subscribe();
-    this.notificationService.demarrerSondage();
+    this.notificationService.connecterTempsReel();
 
     effect(() => {
       this.sidenavOuvert.set(!this.estMobile());
@@ -66,7 +66,7 @@ export class Shell implements OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.notificationService.arreterSondage();
+    this.notificationService.deconnecterTempsReel();
   }
 
   basculerSidenav(): void {
